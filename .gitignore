@@ -1,0 +1,47 @@
+## Ignore Visual Studio temporary files, build results, and
+## user-specific files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Build results
+bin/
+obj/
+
+## NuGet packages
+packages/
+*.nupkg
+# Uncomment if you use package restore
+# !packages/repositories.config
+
+## Microsoft SQL Server database files
+*.mdf
+*.ldf
+
+## SQL Server LocalDB generated files
+App_Data/*.mdf
+App_Data/*.ldf
+
+## Logs
+*.log
+
+## Web publish artifacts
+publish/
+*.Publish.xml
+
+## Resharper files
+_ReSharper*/
+*.DotSettings.user
+
+## Rider IDE
+.idea/
+
+## ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+## Others
+*.dbmdl
+*.bak
+*.orig

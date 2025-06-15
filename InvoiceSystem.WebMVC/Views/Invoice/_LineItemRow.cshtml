@@ -1,0 +1,62 @@
+﻿@model InvoiceSystem.Core.Models.InvoiceLineItem
+@{
+    var index = ViewData["index"];
+}
+
+<tr class="line-item-row">
+    @Html.HiddenFor(model => model.LineItemId)
+    @Html.HiddenFor(model => model.InvoiceId)
+    @Html.Hidden("LineItems.Index", index)
+
+    <td>
+        @Html.TextBoxFor(model => model.Name, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+    </td>
+    <td>
+        @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = 1 })
+        @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+    </td>
+    <td>
+        @Html.TextBoxFor(model => model.Quantity, new { @class = "form-control qty-input", type = "number", step = "1" })
+        @Html.ValidationMessageFor(model => model.Quantity, "", new { @class = "text-danger" })
+    </td>
+    <td>
+        @Html.TextBoxFor(model => model.PriceExVAT, new { @class = "form-control price-input", type = "number", step = "0.01" })
+        @Html.ValidationMessageFor(model => model.PriceExVAT, "", new { @class = "text-danger" })
+    </td>
+    <td>
+        @Html.TextBoxFor(model => model.VATAmount, new { @class = "form-control vat-input", type = "number", step = "0.01" })
+        @Html.ValidationMessageFor(model => model.VATAmount, "", new { @class = "text-danger" })
+    </td>
+    <td>
+        <span class="form-control-static price-incl-vat-display">@((Model.PriceExVAT + Model.VATAmount).ToString("F2"))</span>
+        @Html.HiddenFor(model => model.PriceInclVAT)
+    </td>
+    <td>
+        <span class="form-control-static line-total-display">@Model.LineTotal.ToString("F2")</span>
+        @Html.HiddenFor(model => model.LineTotal)
+    </td>
+    <td class="line-item-actions">
+        <button type="button" class="btn btn-danger btn-sm removeLineItem" title="Remove Line Item">X</button>
+    </td>
+</tr>
+
+<script>
+    $(document).ready(function () {
+        $('.qty-input, .price-input, .vat-input').off('input').on('input', function () {
+            const $row = $(this).closest('tr');
+            const qty = parseFloat($row.find('.qty-input').val()) || 0;
+            const priceExVat = parseFloat($row.find('.price-input').val()) || 0;
+            const vatAmount = parseFloat($row.find('.vat-input').val()) || 0;
+
+            const priceInclVat = priceExVat + vatAmount;
+            const lineTotal = qty * priceInclVat;
+
+            $row.find('.price-incl-vat-display').text(priceInclVat.toFixed(2));
+            $row.find('input[name$=".PriceInclVAT"]').val(priceInclVat.toFixed(2));
+
+            $row.find('.line-total-display').text(lineTotal.toFixed(2));
+            $row.find('input[name$=".LineTotal"]').val(lineTotal.toFixed(2));
+        });
+    });
+</script>

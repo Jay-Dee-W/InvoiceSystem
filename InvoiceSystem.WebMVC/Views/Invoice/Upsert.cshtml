@@ -1,0 +1,114 @@
+﻿@model InvoiceSystem.Core.Models.Invoice
+
+@{
+    ViewBag.Title = Model.InvoiceId == 0 ? "Create Invoice" : "Edit Invoice";
+    var index = 0;
+}
+
+<h2>@ViewBag.Title</h2>
+
+@using (Html.BeginForm("Upsert", "Invoice", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @*@Html.ValidationSummary(true, "", new { @class = "text-danger" })*@
+    @Html.HiddenFor(m => m.InvoiceId)
+    @Html.HiddenFor(m => m.CreatedDate)
+    @Html.HiddenFor(m => m.CapturedIP)
+    @Html.HiddenFor(m => m.CapturedMachineName)
+    @Html.HiddenFor(m => m.InvoiceTotal)
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.InvoiceNumber)
+        @Html.TextBoxFor(m => m.InvoiceNumber, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.InvoiceNumber)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.SupplierName)
+        @Html.TextBoxFor(m => m.SupplierName, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.SupplierName)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.SupplierAddress)
+        @Html.TextBoxFor(m => m.SupplierAddress, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.SupplierAddress)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.SupplierContact)
+        @Html.TextBoxFor(m => m.SupplierContact, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.SupplierContact)
+    </div>
+
+    <h4>Line Items</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Qty</th>
+                <th>Price Ex VAT</th>
+                <th>VAT</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.LineItems.Count; i++)
+            {
+                <tr>
+                    @Html.HiddenFor(m => m.LineItems[i].LineItemId)
+                    @Html.HiddenFor(m => m.LineItems[i].InvoiceId)
+                    @Html.HiddenFor(m => m.LineItems[i].PriceInclVAT)
+                    @Html.HiddenFor(m => m.LineItems[i].LineTotal)
+
+                    <td>@Html.TextBoxFor(m => m.LineItems[i].Name, new { @class = "form-control" })</td>
+                    <td>@Html.TextBoxFor(m => m.LineItems[i].Description, new { @class = "form-control" })</td>
+                    <td>@Html.TextBoxFor(m => m.LineItems[i].Quantity, new { @class = "form-control", type = "number" })</td>
+                    <td>@Html.TextBoxFor(m => m.LineItems[i].PriceExVAT, new { @class = "form-control decimal-input", step = "0.01", type = "text" })</td>
+                    <td>@Html.TextBoxFor(m => m.LineItems[i].VATAmount, new { @class = "form-control decimal-input", step = "0.01", type = "text" })</td>
+                    <td><button type="button" class="btn btn-danger remove-line">Remove</button></td>
+                </tr>
+            }
+            <tr class="line-item-template d-none">
+                <td>
+                    <input name="LineItems[__index__].LineItemId" type="hidden" value="0" />
+                    <input name="LineItems[__index__].InvoiceId" type="hidden" value="0" />
+                    <input name="LineItems[__index__].PriceInclVAT" type="hidden" value="0.00" />
+                    <input name="LineItems[__index__].LineTotal" type="hidden" value="0.00" />
+                    <input name="LineItems[__index__].Name" class="form-control" />
+                </td>
+                <td><input name="LineItems[__index__].Description" class="form-control" /></td>
+                <td><input name="LineItems[__index__].Quantity" type="number" class="form-control" /></td>
+                <td><input name="LineItems[__index__].PriceExVAT" type="text" class="form-control" /></td>
+                <td><input name="LineItems[__index__].VATAmount" type="text" class="form-control" /></td>
+                <td><button type="button" class="btn btn-danger remove-line">Remove</button></td>
+            </tr>
+        </tbody>
+    </table>
+    <button type="button" id="add-line-item" class="btn btn-secondary">Add Line Item</button>
+    <button type="submit" class="btn btn-primary">Save Invoice</button>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+    let lineIndex = @Model.LineItems.Count;
+
+    $('#add-line-item').on('click', function () {
+        const $template = $('.line-item-template').clone().removeClass('line-item-template d-none');
+        $template.html($template.html().replace(/__index__/g, lineIndex));
+        $('tbody').append($template);
+        lineIndex++;
+    });
+
+    $(document).on('click', '.remove-line', function () {
+        $(this).closest('tr').remove();
+    });
+
+    $(document).on('input', '.decimal-input', function () {
+        this.value = this.value.replace(',', '.').replace(/[^0-9.]/g, '');
+    });
+
+    </script>
+}
