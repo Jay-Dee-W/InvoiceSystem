@@ -126,9 +126,6 @@ else
                                 alert(response.message); // Show success message
                                 // Check if no more invoices, then show the "No invoices found" message
                                 if ($('#lineItemsTable tbody tr').length === 0) {
-                                    // You might need to add a div to show this message dynamically
-                                    // For now, a simple reload or adding a div will work.
-                                    // A more robust solution would be to hide the table and show the info div.
                                     location.reload(); // Simple reload for demonstration
                                 }
                             } else {
